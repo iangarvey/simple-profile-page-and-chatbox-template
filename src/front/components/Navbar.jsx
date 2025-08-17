@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Login } from "../pages/Login";
 
 export const Navbar = () => {
 
@@ -13,6 +14,9 @@ export const Navbar = () => {
 						<button className="btn btn-primary">Check the Context in action</button>
 					</Link>
 				</div>
+				<Link to="/login">
+					<button className="btn btn-success">Login</button>
+				</Link>
 			</div>
 		</nav>
 	);
