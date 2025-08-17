@@ -1,19 +1,69 @@
+import { useState } from "react";
+
 export const Login = () => {
-    return (
-        <div>
-            <form className="container border border-info p-2 " style={{ width: "500px" }}>
-                <div class="mb-3">
-                    <label for="exampleInputEmail1" class="form-label">Email address</label>
-                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"></input>
-                        <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
-                </div>
-                <div class="mb-3">
-                    <label for="exampleInputPassword1" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1"></input>
-                </div>
-                <button type="submit" class="btn btn-primary">Login</button>
-            </form>
-            
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleClick = () => {
+
+    const opts = {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            "email": email,
+            "password": password
+        })
+    }
+    fetch(`https://fantastic-telegram-7v5q56jrvrr5cxw45-3001.app.github.dev/api/token`, opts)
+      .then(resp => {
+        if(resp.status === 200) return resp.json();
+        else alert("There has been some error")
+      })
+      .then()
+      .catch(error => {
+        console.error("There was an error!!!", error);
+      })
+
+  }
+
+  return (
+    <div>
+      <form
+        className="container border border-info p-2 "
+        style={{ width: "500px" }}
+      >
+        <div className="mb-3">
+          <label for="exampleInputEmail1" className="form-label">
+            Email address
+          </label>
+          <input
+            type="email"
+            className="form-control"
+            id="exampleInputEmail1"
+            aria-describedby="emailHelp"
+            onChange={(e) => setEmail(e.target.value)}
+            value = {email}
+          ></input>
+          <div id="emailHelp" className="form-text">
+            We'll never share your email with anyone else.
+          </div>
         </div>
-    )
-}
+        <div className="mb-3">
+          <label for="exampleInputPassword1" className="form-label">
+            Password
+          </label>
+          <input
+            type="password"
+            className="form-control"
+            id="exampleInputPassword1"
+            onChange={(e) => setPassword(e.target.value)}
+            value = {password}
+          ></input>
+        </div>
+        <button type="submit" className="btn btn-primary" onClick={handleClick}>
+          Login
+        </button>
+      </form>
+    </div>
+  );
+};

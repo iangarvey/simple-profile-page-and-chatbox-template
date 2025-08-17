@@ -54,7 +54,7 @@ import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 export const Home = () => {
 	return (
 		<div className="home-container">
-			<button type="button" class="btn btn-success">Player 1</button>
+			<button type="button" class="btn btn-success">Button</button>
 		</div>
 	)
 }
