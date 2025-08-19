@@ -3,6 +3,8 @@ import { useState } from "react";
 export const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const token = localStorage.getItem("token");
+  console.log("This is your token ", token)
 
   const handleClick = () => {
 
@@ -19,7 +21,9 @@ export const Login = () => {
         if(resp.status === 200) return resp.json();
         else alert("There has been some error")
       })
-      .then()
+      .then(data => {
+        localStorage.setItem("token", data.access_token)
+      })
       .catch(error => {
         console.error("There was an error!!!", error);
       })
@@ -28,6 +32,11 @@ export const Login = () => {
 
   return (
     <div>
+      <h1 className="page-title d-flex justify-content-center">Login</h1>
+      <div>
+        {(token && token!="" && token!=undefined) ? (
+        "You are logged in with this token" + token 
+        ) : (  
       <form
         className="container border border-info p-2 "
         style={{ width: "500px" }}
@@ -64,6 +73,8 @@ export const Login = () => {
           Login
         </button>
       </form>
+      )}
+      </div>
     </div>
   );
 };
