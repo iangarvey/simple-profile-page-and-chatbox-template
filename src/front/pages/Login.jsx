@@ -3,10 +3,11 @@ import { useState } from "react";
 export const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loggedIn, setLoggedIn] = useState(localStorage.access ? true : false );
   const token = localStorage.getItem("token");
-  console.log("This is your token ", token)
+  console.log("This is your token: ", token)
 
-  const handleClick = () => {
+  const handleLogin = () => {
 
     const opts = {
         method: 'POST',
@@ -30,12 +31,16 @@ export const Login = () => {
 
   }
 
+  const handleLogout = () => {
+    fetch
+  }
+
   return (
     <div>
       <h1 className="page-title d-flex justify-content-center">Login</h1>
       <div>
         {(token && token!="" && token!=undefined) ? (
-        "You are logged in with this token" + token 
+        "You are logged in with this token " + token 
         ) : (  
       <form
         className="container border border-info p-2 "
@@ -69,9 +74,14 @@ export const Login = () => {
             value = {password}
           ></input>
         </div>
-        <button type="submit" className="btn btn-primary" onClick={handleClick}>
+
+        {/* Login button needs to change to a "logout" button 
+        and Token needs to be removed from the localStorage */}
+
+        <button type="submit" className="btn btn-primary" onClick={handleLogin}>
           Login
         </button>
+
       </form>
       )}
       </div>
