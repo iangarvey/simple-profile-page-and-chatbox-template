@@ -2,8 +2,8 @@ export const initialStore=()=>{
   return{
     message: null,
     user: null,
-    isAuthenticated: !!localStorage.getItem("token"),
-    token: localStorage.getItem("token")
+    // isAuthenticated: !!localStorage.getItem("token"),
+    // token: localStorage.getItem("token")
   }
 }
 
@@ -12,27 +12,27 @@ export default function storeReducer(store, action = {}) {
 
     // Login action
 
-    case 'login':
-      const { token, user } = action.payload
-      return {
-        ...store,
-        token: token,
-        user: user,
-        isAuthenticated: true
-      };
+    // case 'login':
+    //   const { token, user } = action.payload
+    //   return {
+    //     ...store,
+    //     token: token,
+    //     user: user,
+    //     isAuthenticated: true
+    //   };
     
-    // Logout action
+    // // Logout action
 
-    case 'logout':
-      localStorage.removeItem("token");
-      return {
-        ...store,
-        token: null,
-        user: null,
-        isAuthenticated: false
-      };
+    // case 'logout':
+    //   localStorage.removeItem("token");
+    //   return {
+    //     ...store,
+    //     token: null,
+    //     user: null,
+    //     isAuthenticated: false
+    //   };
 
-      default:
-        throw Error('Unkown action: ' + action.type);
+    //   default:
+    //     throw Error('Unkown action: ' + action.type);
   }    
 }

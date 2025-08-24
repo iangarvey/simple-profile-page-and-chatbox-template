@@ -1,11 +1,10 @@
 import { useState } from "react";
+import { useGlobalReducer } from "../hooks/useGlobalReducer"
 
 export const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loggedIn, setLoggedIn] = useState(localStorage.access ? true : false );
-  const token = localStorage.getItem("token");
-  console.log("This is your token: ", token)
+  const [loading, isLoading] = useState("false");
 
   const handleLogin = () => {
 
