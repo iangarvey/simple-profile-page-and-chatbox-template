@@ -1,7 +1,37 @@
-import { Link } from "react-router-dom";
-import { Login } from "../pages/Login";
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 export const Navbar = () => {
+	const [loggedIn, setLoggedIn] = useState(false);
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		const checkAuthStatus = () => {
+			const token = localStorage.getItem("token");
+			setLoggedIn(!!token);
+		};
+		checkAuthStatus();
+		window.addEventListener('storage', checkAuthStatus);
+		window.addEventListener('authChange', checkAuthStatus);
+
+		return () => {
+			window.removeEventListener('storage', checkAuthStatus);
+			window.removeEventListener('authChange', checkAuthStatus);
+		};
+	}, []);
+
+	const handleLogout = () => {
+		localStorage.removeItem("token");
+		setLoggedIn(false);
+
+		// Notify other components of auth change
+		window.dispatchEvent(new Event('authChange'));
+
+		alert("You have been logged out successfully!");
+
+		window.location.href = '/login';
+
+	};
 
 	return (
 		<nav className="navbar navbar-light bg-light">
@@ -14,9 +44,15 @@ export const Navbar = () => {
 						<button className="btn btn-primary">Check the Context in action</button>
 					</Link>
 				</div>
-				<Link to="/login">
-					<button className="btn btn-success">Login</button>
-				</Link>
+				{loggedIn ? (
+					<button className="btn btn-danger" onClick={handleLogout}>
+						Logout
+					</button>
+				) : (
+					<Link to="/login">
+						<button className="btn btn-success">Login</button>
+					</Link>
+				)}
 			</div>
 		</nav>
 	);
