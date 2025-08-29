@@ -36,18 +36,6 @@ export const Login = () => {
 
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setLoggedIn(false);
-    setEmail("");
-    setPassword("");
-
-    // Notify navbar and other components of auth change
-    window.dispatchEvent(new Event('authChange'));
-
-    alert("You have been logged out successfully!")
-  }
-
   return (
     <div>
       <h1 className="page-title d-flex justify-content-center">Login</h1>
