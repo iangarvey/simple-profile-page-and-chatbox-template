@@ -20,7 +20,7 @@ ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../dist/')
 app = Flask(__name__)
-CORS(app, origins="*")
+CORS(app, origins="https://fantastic-telegram-7v5q56jrvrr5cxw45-3000.app.github.dev/register")
 app.url_map.strict_slashes = False
 
 app.config["JWT_SECRET_KEY"] = os.environ.get('JWT_SECRET')
@@ -47,15 +47,14 @@ setup_commands(app)
 # Add all endpoints form the API with a "api" prefix
 app.register_blueprint(api, url_prefix='/api')
 
-# Trying to fix a persistent CORS error but this isn't the best for security 
+# trying to fix a persistent CORS error but this isn't the best security practice 
 
 @app.after_request
 def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Origin', 'https://fantastic-telegram-7v5q56jrvrr5cxw45-3000.app.github.dev')
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
     return response
-
 
 # Handle/serialize errors like a JSON object
 

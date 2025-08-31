@@ -4,7 +4,6 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User
 from api.utils import generate_sitemap, APIException
-from flask_cors import CORS
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
@@ -13,9 +12,6 @@ import os
 from werkzeug.security import generate_password_hash, check_password_hash
 
 api = Blueprint('api', __name__)
-
-# Allow CORS requests to this API
-CORS(api)
 
 # ============ Register ============#
 
@@ -36,7 +32,15 @@ def create_user():
     db.session.add(user)
     db.session.commit()
 
-    return jsonify({"message": "User registered successfully"}), 201
+    access_token = create_access_token(identity=email)
+
+    return jsonify({
+        "message": "User registered successfully",
+        "access_token": access_token,
+        "user": user.serialize()
+    }), 201
+
+
 
 
 # ============ Login ============#
@@ -45,8 +49,20 @@ def create_user():
 def create_token():
     email = request.json.get("email", None)
     password = request.json.get("password", None)
-    if email != "test" or password != "test":
+    
+    if not email or not password:
+        return jsonify({"msg": "Email and password required"}), 400
+    
+    # Find user by email
+    user = User.query.filter_by(email=email).first()
+    
+    # Check if user exists and password is correct
+    if not user or not user.check_password(password):
         return jsonify({"msg": "Bad username or password"}), 401
+    
+    # Check if user is active
+    if not user.is_active:
+        return jsonify({"msg": "Account is inactive"}), 401
 
     access_token = create_access_token(identity=email)
-    return jsonify(access_token=access_token)
+    return jsonify(access_token=access_token), 200
