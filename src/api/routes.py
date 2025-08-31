@@ -11,8 +11,6 @@ from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User
-
 
 api = Blueprint('api', __name__)
 

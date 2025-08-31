@@ -47,6 +47,16 @@ setup_commands(app)
 # Add all endpoints form the API with a "api" prefix
 app.register_blueprint(api, url_prefix='/api')
 
+# Trying to fix a persistent CORS error but this isn't the best for security 
+
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
+    return response
+
+
 # Handle/serialize errors like a JSON object
 
 
