@@ -5,14 +5,14 @@ export const Register = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null); // added error state
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
 
     const response = await fetch(
-      `${import.meta.env.VITE_BACKEND_URL}/api/signup`,
+      `${import.meta.env.VITE_BACKEND_URL}/api/register`,
       {
         method: "POST",
         headers: {
@@ -96,6 +96,10 @@ export const Register = () => {
         <button type="submit" className="btn btn-primary">
           Register
         </button>
+
+        <p className="mt-3">
+          Already have an account? <a href="/login">Login</a>
+        </p>
       </form>
     </div>
   );

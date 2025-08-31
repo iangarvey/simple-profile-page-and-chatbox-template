@@ -11,6 +11,7 @@ from flask_jwt_extended import jwt_required
 from flask_jwt_extended import JWTManager
 import os
 from werkzeug.security import generate_password_hash, check_password_hash
+from models import db, User
 
 
 api = Blueprint('api', __name__)
@@ -21,41 +22,33 @@ CORS(api)
 # ============ Register ============#
 
 
-@api.route("/register", methods=["POST"])
-def register():
+@api.route('/register', methods=['POST'])
+def create_user():
     data = request.get_json()
-    if data or 'email' not in data or 'password' not in data:
-        return jsonify({"error": "email and password required"}), 400
+    username = data.get('username')
+    email = data.get('email')
+    password = data.get('password')
 
-    if User.query.filter_by(email=data['email']).first():
-        return jsonify({"error": "User already exists"}), 400
+    # Check if user exists
+    if User.query.filter_by(username=username).first() or User.query.filter_by(email=email).first():
+        return jsonify({"error": "Username or email already exists"}), 400
 
+    user = User(username=username, email=email, is_active=True)
+    user.set_password(password)
+    db.session.add(user)
+    db.session.commit()
 
-    hashed_password = generate_password_hash(data['password'])
-    
-    new_user = User(
-        email=data['email'],
-        password=hashed_password,
-        is_active=False
-        )
-
-    try:
-        db.session.add(new_user)
-        db.session.commit()
-        return jsonify({"message": "User created successfully"}), 201
-    except Exception as e: 
-        db.session.rollback()
-        return jsonify({"error": str(e)}), 500
+    return jsonify({"message": "User registered successfully"}), 201
 
 
 # ============ Login ============#
 
-@ api.route("/token", methods=["POST"])
+@api.route("/token", methods=["POST"])
 def create_token():
-    email=request.json.get("email", None)
-    password=request.json.get("password", None)
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
     if email != "test" or password != "test":
         return jsonify({"msg": "Bad username or password"}), 401
 
-    access_token=create_access_token(identity=email)
+    access_token = create_access_token(identity=email)
     return jsonify(access_token=access_token)
