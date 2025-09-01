@@ -23,7 +23,7 @@ def create_user():
     email = data.get('email')
     password = data.get('password')
 
-    # Check if user exists
+    # Check if user exists and create user 
     if User.query.filter_by(username=username).first() or User.query.filter_by(email=email).first():
         return jsonify({"error": "Username or email already exists"}), 400
 
@@ -32,20 +32,22 @@ def create_user():
     db.session.add(user)
     db.session.commit()
 
-    access_token = create_access_token(identity=email)
+    access_token = create_access_token(identity=user.id)
+    return jsonify({"message": "User registered successfully", "access_token": access_token}), 201
 
-    return jsonify({
-        "message": "User registered successfully",
-        "access_token": access_token,
-        "user": user.serialize()
-    }), 201
+    # return jsonify({
+    #     "token": "<JWT_TOKEN>",
+    #     "message": "User registered successfully",
+    #     "access_token": access_token,
+    #     "user": user.serialize()
+    # }), 201
 
 
 
 
 # ============ Login ============#
 
-@api.route("/token", methods=["POST"])
+@api.route("/login", methods=["POST"])
 def create_token():
     email = request.json.get("email", None)
     password = request.json.get("password", None)
@@ -64,5 +66,41 @@ def create_token():
     if not user.is_active:
         return jsonify({"msg": "Account is inactive"}), 401
 
-    access_token = create_access_token(identity=email)
+    access_token = create_access_token(identity=user.id)
     return jsonify(access_token=access_token), 200
+
+# ============ Logout ============#
+
+@api.route('/logout', methods=['POST'])
+@jwt_required()
+def logout():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+
+    if user:
+        user.is_active = False
+        db.session.commit()
+
+    return jsonify({"message": "Logged out successfully"}), 200
+
+
+# ============ Get Profile (Private) ============#
+
+@api.route('/myprofile', methods=['GET'])
+@jwt_required()
+def private():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    
+    return jsonify({
+        "message": "The private page works!",
+        "user": {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email
+        }
+    }), 200
+

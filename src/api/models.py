@@ -37,6 +37,7 @@ class User(db.Model):
 class Profile(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), index=True)
+    username: Mapped[str] = mapped_column(String(20), unique=True, nullable=False)
     profile_pic_url: Mapped[str] = mapped_column(db.Text)
 
     def serialize(self):

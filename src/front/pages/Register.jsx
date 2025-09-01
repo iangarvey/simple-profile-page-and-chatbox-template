@@ -7,12 +7,13 @@ export const Register = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const apiUrl = `${import.meta.env.VITE_BACKEND_URL}`;
 
   const handleRegister = async (e) => {
     e.preventDefault();
 
     const response = await fetch(
-      `${import.meta.env.VITE_BACKEND_URL}/api/register`,
+      `${apiUrl}/api/register`,
       {
         method: "POST",
         headers: {
@@ -29,11 +30,11 @@ export const Register = () => {
       return;
     }
 
-    if (data.token) {
-      localStorage.setItem("token", data.token);
+    if (data.access_token) {
+      localStorage.setItem("token", data.access_token);
     }
 
-    navigate("/profile");
+    navigate("/myprofile");
   };
 
   return (
