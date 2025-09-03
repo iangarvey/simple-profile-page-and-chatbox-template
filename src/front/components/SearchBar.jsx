@@ -1,16 +1,23 @@
-// 5 Steps to Create a Search Bar in React
+import { useState, useEffect } from "react";
+
+//   Steps to Create a Search Bar in React
 
 //     Create the search bar UI.
-//     Add the dummy content.
-//     Map data to form the list.
 //     Store user input.
 //     Filter the data using the filter function.
 
 export const SearchBar = () => {
+    const [searchUser, setSearchUser] = useState("");
+
+    const handleSearchUser = (e) => {
+        var lowerCase = e.target.value.toLowerCase();
+        setSearchUser(lowerCase);
+    }
+
     return (
-        <div className="search-bar">
-            <input type="text" placeholder="Search..." />
-            <button type="submit">Search</button>
-        </div>
-    );
+        <>
+            <input value={searchUser} onChange={e => setSearchUser(e.target.value)} />
+            <button onClick={handleSearchUser}>Search</button>
+        </>
+    )
 }
