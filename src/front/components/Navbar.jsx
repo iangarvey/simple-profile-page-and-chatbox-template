@@ -52,9 +52,15 @@ export const Navbar = () => {
 						<button className="btn btn-success">Login</button>
 					</Link>
 				)}
-				<Link to="/register">
-					<button className="btn btn-primary">Register</button>
-				</Link>
+				{loggedIn ? (
+					<Link to="/myprofile">
+						<button className="btn btn-info">My Profile</button>
+					</Link>
+				) : (
+					<Link to="/register">
+						<button className="btn btn-primary">Register</button>
+					</Link>
+				)}
 			</div>
 		</nav>
 	);
