@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { SearchBar } from "./SearchBar";
 
 export const Navbar = () => {
 	const [loggedIn, setLoggedIn] = useState(false);
@@ -42,6 +43,9 @@ export const Navbar = () => {
 					<Link to="/demo">
 						<button className="btn btn-primary">Check the Context in action</button>
 					</Link>
+				</div>
+				<div>
+					<SearchBar />
 				</div>
 				{loggedIn ? (
 					<button className="btn btn-danger" onClick={handleLogout}>
