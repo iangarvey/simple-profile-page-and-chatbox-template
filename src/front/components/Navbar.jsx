@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 
 export const Navbar = () => {
 	const [loggedIn, setLoggedIn] = useState(false);
-	const navigate = useNavigate();
 
 	useEffect(() => {
 		const checkAuthStatus = () => {

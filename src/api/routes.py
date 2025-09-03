@@ -66,12 +66,12 @@ def create_token():
     if not user.is_active:
         return jsonify({"msg": "Account is inactive"}), 401
 
-    access_token = create_access_token(identity=user.id)
-    return jsonify(access_token=access_token), 200
+    access_token = create_access_token(identity=str(user.id))
+    return jsonify({ "token": access_token, "user_id": user.id })
 
 # ============ Logout ============#
 
-@api.route('/logout', methods=['POST'])
+@api.route('/logout', methods=['DELETE'])
 @jwt_required()
 def logout():
     current_user_id = get_jwt_identity()

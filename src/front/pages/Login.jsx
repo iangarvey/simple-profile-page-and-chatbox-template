@@ -1,13 +1,26 @@
-import { use } from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loggedIn, setLoggedIn] = useState(localStorage.getItem("token" ? true : false));
   const token = localStorage.getItem("token");
+  const apiUrl = `${import.meta.env.VITE_BACKEND_URL}`;
+  const navigate = useNavigate();
 
-  const handleLogin = () => {
+  useEffect(() => {
+          const token = localStorage.getItem("token");
+          if (token) {
+              navigate("/myprofile");
+              console.log("Token found, navigating to /myprofile");
+              return;
+          }
+  }, [navigate]);
+
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
     const opts = {
       method: 'POST',
@@ -17,24 +30,43 @@ export const Login = () => {
         "password": password
       })
     }
-    fetch(`https://fantastic-telegram-7v5q56jrvrr5cxw45-3001.app.github.dev/api/token`, opts)
-      .then(resp => {
-        if (resp.status === 200) return resp.json();
-        else alert("There has been some error")
-      })
-      .then(data => {
-        localStorage.setItem("token", data.access_token);
-        setLoggedIn(true);
+    // fetch(`${apiUrl}api/login`, opts)
+    //   .then(resp => {
+    //     if (resp.status === 200) return resp.json();
+    //     else alert("There has been some error")
+    //   })
+    //   .then(data => {
+    //     localStorage.setItem("token", data.access_token);
+    //     setLoggedIn(true);
 
-        // Notify navbar and other components of auth change
-        window.dispatchEvent(new Event('authChange'));
+    //     // Notify navbar and other components of auth change
+    //     window.dispatchEvent(new Event('authChange'));
         
-      })
-      .catch(error => {
-        console.error("There was an error!!!", error);
-      })
+    //   })
+    //   .catch(error => {
+    //     console.error("There was an error!!!", error);
+    //   })
+    
+    const response = await fetch(
+      `${apiUrl}api/login`,
+      opts
+    );
 
-  }
+    const data = await response.json();
+    console.log("here's your data", data)
+
+    if (!response.ok) {
+      alert(data.error || "Login failed");
+      return;
+    }
+
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+      setLoggedIn(true);
+      
+      // Notify navbar and other components of auth change
+      window.dispatchEvent(new Event('authChange'));
+  }}
 
   return (
     <div>
@@ -75,9 +107,6 @@ export const Login = () => {
                 value={password}
               ></input>
             </div>
-
-            {/* Login button needs to change to a "logout" button 
-        and Token needs to be removed from the localStorage */}
 
             <button type="submit" className="btn btn-primary" onClick={handleLogin}>
               Login

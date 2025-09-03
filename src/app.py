@@ -20,7 +20,7 @@ ENV = "development" if os.getenv("FLASK_DEBUG") == "1" else "production"
 static_file_dir = os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../dist/')
 app = Flask(__name__)
-CORS(app, origins="https://fantastic-telegram-7v5q56jrvrr5cxw45-3000.app.github.dev/register")
+CORS(app, origins="*")
 app.url_map.strict_slashes = False
 
 app.config["JWT_SECRET_KEY"] = os.environ.get('JWT_SECRET')

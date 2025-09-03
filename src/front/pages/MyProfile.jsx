@@ -13,34 +13,34 @@ export const MyProfile = () => {
             navigate("/login");
             return;
         }
-        console.log("Token:", typeof token);
+        console.log("Token:", token);
 
-        const fetchMyProfile = async () => {
-            const token = localStorage.getItem("token");
-            const response = await fetch(
-                `${apiUrl}api/myprofile`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
-
-            const data = await response.json();
-            console.log("Profile response:", data);
-
-            if (!response.ok) {
-                setError(data.error || "Failed to fetch private data");
-                return;
+    const fetchMyProfile = async () => {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+            `${apiUrl}api/myprofile`,
+            {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
             }
+        );
 
-            setUserData(data.user);
-        };
+        const data = await response.json();
+        console.log("Profile response:", data);
 
-        fetchMyProfile();
-    }, [navigate]);
+        if (!response.ok) {
+            setError(data.error || "Failed to fetch private data");
+            return;
+        }
+        console.log("User data:", data.user);
+        setUserData(data.user);
+    };
+
+    fetchMyProfile();
+}, [navigate]);
 
     if (error) {
         return <div className="container alert alert-danger">{error}</div>;

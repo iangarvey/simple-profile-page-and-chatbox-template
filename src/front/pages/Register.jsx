@@ -13,7 +13,7 @@ export const Register = () => {
     e.preventDefault();
 
     const response = await fetch(
-      `${apiUrl}/api/register`,
+      `${apiUrl}api/register`,
       {
         method: "POST",
         headers: {
