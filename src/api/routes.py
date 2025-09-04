@@ -84,7 +84,7 @@ def logout():
     return jsonify({"message": "Logged out successfully"}), 200
 
 
-# ============ Get Profile (Private) ============#
+# ============ Get My Profile (Private) ============#
 
 @api.route('/myprofile', methods=['GET'])
 @jwt_required()
@@ -104,3 +104,16 @@ def private():
         }
     }), 200
 
+@api.route('/profile/<username>', methods=['GET'])
+def get_user_by_username(username):
+    user = User.query.filter_by(username=username).first()
+    
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    
+    return jsonify({
+        "user": {
+            "id": user.id,
+            "username": user.username,
+        }
+    }), 200

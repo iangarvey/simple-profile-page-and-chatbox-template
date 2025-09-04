@@ -52,9 +52,14 @@ import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 // }; 
 
 export const Home = () => {
+
+	const handleNavigateTestProfile = () => {
+		window.location.href = "/profile/test";
+	}
+
 	return (
 		<div className="home-container">
-			<button type="button" class="btn btn-success">Button</button>
+			<button type="button" class="btn btn-success" onClick={handleNavigateTestProfile}>Button</button>
 		</div>
 	)
 }
