@@ -1,14 +1,9 @@
 import { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
-
-// Fetch the user data from your backend using the username from the URL.
-// Store it in state and use it for rendering.
-
-
-// ...existing imports...
+import { Link, useParams, useNavigate } from "react-router-dom";
 
 export const Profile = () => {
     const { username } = useParams();
+    const navigate = useNavigate();
     const [userData, setUserData] = useState(null);
     const [error, setError] = useState("");
     const [isCreatingConversation, setIsCreatingConversation] = useState(false);
@@ -16,48 +11,50 @@ export const Profile = () => {
 
     useEffect(() => {
         const fetchUserProfile = async () => {
-            const response = await fetch(
-                `${apiUrl}api/profile/${username}`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+            const response = await fetch(`${apiUrl}api/profile/${username}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
                 }
-            );
+            });
 
             const data = await response.json();
             if (!response.ok) {
-                setError(data.error || "Failed to fetch user data");
+                setError(data.error || 'Failed to fetch user data');
                 return;
             }
             setUserData(data.user);
-        }
+            setError(""); // Clear any previous errors
+        };
+        
         fetchUserProfile();
     }, [username, apiUrl]);
 
     const handleMessageClick = async () => {
-        if (isCreatingConversation) return; // Prevent multiple clicks
+        if (!userData) return;
+        
         setIsCreatingConversation(true);
-
+        const token = localStorage.getItem('token');
+        
         const response = await fetch(`${apiUrl}api/conversations`, {
-            method: "POST",
+            method: 'POST',
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ member_username: username }),
+            body: JSON.stringify({ contact_user_id: userData.id })
         });
 
         const data = await response.json();
         if (!response.ok) {
-            setError(data.error || "Failed to create conversation");
+            setError(data.error || 'Failed to create conversation');
             setIsCreatingConversation(false);
             return;
         }
-
-        // Redirect to the newly created conversation
-        window.location.href = `/messages/${data.conversation_id}`;
-    }
+        
+        setIsCreatingConversation(false);
+        navigate('/messages');
+    };
 
     if (error) {
         return <div className="container alert alert-danger">{error}</div>;
@@ -71,9 +68,15 @@ export const Profile = () => {
         <div>
             <div className="page-container d-flex align-items-center justify-content-center">
                 <div className="profile-container d-flex flex-column align-items-center justify-content-center border border-3 w-50">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTF5-3YjBcXTqKUlOAeUUtuOLKgQSma2wGG1g&s" alt="Profile" className="rounded-full" />
-                    <h1 style={{ textAlign: "center" }}>Welcome to {userData.username}'s profile!</h1>
-                    <button
+                    <img 
+                        src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTF5-3YjBcXTqKUlOAeUUtuOLKgQSma2wGG1g&s" 
+                        alt="Profile" 
+                        className="rounded-full" 
+                    />
+                    <h1 style={{ textAlign: "center" }}>
+                        Welcome to {userData.username}'s profile!
+                    </h1>
+                    <button 
                         className="btn btn-primary"
                         onClick={handleMessageClick}
                         disabled={isCreatingConversation}
@@ -84,4 +87,4 @@ export const Profile = () => {
             </div>
         </div>
     );
-}
+};
