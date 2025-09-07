@@ -13,6 +13,7 @@ import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { MyProfile } from "./pages/MyProfile";
 import { Profile } from "./pages/Profile";
+import { Messages } from "./pages/Messages";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -31,6 +32,7 @@ export const router = createBrowserRouter(
         <Route path= "/register" element={<Register />} />
         <Route path= "/myprofile" element={<MyProfile />} />
         <Route path="/profile/:username" element={<Profile />} />
+        <Route path="/messages" element={<Messages />} />
 
         <Route path="/single/:theId" element={ <Single />} />  {/* Dynamic route for single items */}
         <Route path="/demo" element={<Demo />} />

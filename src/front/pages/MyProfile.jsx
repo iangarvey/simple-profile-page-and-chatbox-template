@@ -22,7 +22,7 @@ export const MyProfile = () => {
                 {
                     method: "GET",
                     headers: {
-                        Authorization: `Bearer ${token}`,
+                        "Authorization": `Bearer ${token}`,
                         "Content-Type": "application/json",
                     },
                 }
@@ -49,6 +49,7 @@ export const MyProfile = () => {
     if (!userData) {
         return <div className="container">Loading...</div>;
     }
+
     return (
         <div>
             <div className="page-container d-flex align-items-center justify-content-center">

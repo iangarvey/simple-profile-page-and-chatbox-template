@@ -6,6 +6,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
 
+# user_id => sender (user who sends the message)
+# recipient_id => receiver (user who receives the message)
+
 class User(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(20), unique=True, nullable=False)
@@ -30,8 +33,9 @@ class User(db.Model):
         }
     
     # Relationships
-    profile = relationship('Profile', back_populates='user', uselist=False, cascade='all, delete-orphan') # cascade = Automatically handles related object deletion
-    messages = relationship('Message', back_populates='user')
+    profile = relationship('Profile', back_populates='user', uselist=False, cascade='all, delete-orphan')
+    messages_sent = relationship('Message', back_populates='sender', foreign_keys='Message.user_id')
+    messages_received = relationship('Message', back_populates='recipient', foreign_keys='Message.recipient_id')
     conversations = relationship('ConversationMember', back_populates='user')
     
 class Profile(db.Model):
@@ -82,7 +86,8 @@ class ConversationMember(db.Model):
 
 class Message(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), index=True)  # sender
+    recipient_id: Mapped[int] = mapped_column(ForeignKey("user.id"), index=True)  # receiver
     conversation_id: Mapped[int] = mapped_column(ForeignKey("conversation.id"), index=True)
     content: Mapped[str] = mapped_column(db.Text)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
@@ -92,6 +97,7 @@ class Message(db.Model):
         return {
             "id": self.id,
             "user_id": self.user_id,
+            "recipient_id": self.recipient_id,
             "conversation_id": self.conversation_id,
             "content": self.content,
             "created_at": self.created_at.isoformat(),
@@ -99,5 +105,6 @@ class Message(db.Model):
         }
 
     # Relationships
-    user = relationship('User', back_populates='messages')
+    sender = relationship('User', back_populates='messages_sent', foreign_keys=[user_id])
+    recipient = relationship('User', back_populates='messages_received', foreign_keys=[recipient_id])
     conversation = relationship('Conversation', back_populates='messages')

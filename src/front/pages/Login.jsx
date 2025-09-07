@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 export const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loggedIn, setLoggedIn] = useState(localStorage.getItem("token" ? true : false));
+  const [loggedIn, setLoggedIn] = useState(localStorage.getItem("token") ? true : false);
   const token = localStorage.getItem("token");
   const apiUrl = `${import.meta.env.VITE_BACKEND_URL}`;
   const navigate = useNavigate();
@@ -18,7 +18,6 @@ export const Login = () => {
           }
   }, [navigate]);
 
-
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -30,22 +29,6 @@ export const Login = () => {
         "password": password
       })
     }
-    // fetch(`${apiUrl}api/login`, opts)
-    //   .then(resp => {
-    //     if (resp.status === 200) return resp.json();
-    //     else alert("There has been some error")
-    //   })
-    //   .then(data => {
-    //     localStorage.setItem("token", data.access_token);
-    //     setLoggedIn(true);
-
-    //     // Notify navbar and other components of auth change
-    //     window.dispatchEvent(new Event('authChange'));
-        
-    //   })
-    //   .catch(error => {
-    //     console.error("There was an error!!!", error);
-    //   })
     
     const response = await fetch(
       `${apiUrl}api/login`,
@@ -66,7 +49,11 @@ export const Login = () => {
       
       // Notify navbar and other components of auth change
       window.dispatchEvent(new Event('authChange'));
-  }}
+      
+      // Navigate after successful login
+      navigate("/myprofile");
+    }
+  }
 
   return (
     <div>

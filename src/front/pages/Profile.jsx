@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
-    // Fetch the user data from your backend using the username from the URL.
-    // Store it in state and use it for rendering.
+// Fetch the user data from your backend using the username from the URL.
+// Store it in state and use it for rendering.
 
 
 // ...existing imports...
@@ -11,6 +11,7 @@ export const Profile = () => {
     const { username } = useParams();
     const [userData, setUserData] = useState(null);
     const [error, setError] = useState("");
+    const [isCreatingConversation, setIsCreatingConversation] = useState(false);
     const apiUrl = `${import.meta.env.VITE_BACKEND_URL}`;
 
     useEffect(() => {
@@ -35,6 +36,29 @@ export const Profile = () => {
         fetchUserProfile();
     }, [username, apiUrl]);
 
+    const handleMessageClick = async () => {
+        if (isCreatingConversation) return; // Prevent multiple clicks
+        setIsCreatingConversation(true);
+
+        const response = await fetch(`${apiUrl}api/conversations`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ member_username: username }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            setError(data.error || "Failed to create conversation");
+            setIsCreatingConversation(false);
+            return;
+        }
+
+        // Redirect to the newly created conversation
+        window.location.href = `/messages/${data.conversation_id}`;
+    }
+
     if (error) {
         return <div className="container alert alert-danger">{error}</div>;
     }
@@ -49,6 +73,13 @@ export const Profile = () => {
                 <div className="profile-container d-flex flex-column align-items-center justify-content-center border border-3 w-50">
                     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTF5-3YjBcXTqKUlOAeUUtuOLKgQSma2wGG1g&s" alt="Profile" className="rounded-full" />
                     <h1 style={{ textAlign: "center" }}>Welcome to {userData.username}'s profile!</h1>
+                    <button
+                        className="btn btn-primary"
+                        onClick={handleMessageClick}
+                        disabled={isCreatingConversation}
+                    >
+                        {isCreatingConversation ? 'Loading...' : `Message ${userData.username}`}
+                    </button>
                 </div>
             </div>
         </div>
