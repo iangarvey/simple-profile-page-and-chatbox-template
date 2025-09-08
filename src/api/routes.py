@@ -15,7 +15,6 @@ api = Blueprint('api', __name__)
 
 # ============ Register ============#
 
-
 @api.route('/register', methods=['POST'])
 def create_user():
     data = request.get_json()
@@ -34,16 +33,6 @@ def create_user():
 
     access_token = create_access_token(identity=user.id)
     return jsonify({"message": "User registered successfully", "access_token": access_token}), 201
-
-    # return jsonify({
-    #     "token": "<JWT_TOKEN>",
-    #     "message": "User registered successfully",
-    #     "access_token": access_token,
-    #     "user": user.serialize()
-    # }), 201
-
-
-
 
 # ============ Login ============#
 
@@ -83,7 +72,6 @@ def logout():
 
     return jsonify({"message": "Logged out successfully"}), 200
 
-
 # ============ Get My Profile (Private) ============#
 
 @api.route('/myprofile', methods=['GET'])
@@ -120,7 +108,8 @@ def get_user_by_username(username):
         }
     }), 200
 
-# ============ GET Contact Tab Data ============#
+# ============ Get Contact Tab Data ============#
+
 @api.route('/contacts', methods=['GET'])
 @jwt_required()
 def get_contacts():
@@ -149,6 +138,7 @@ def get_contacts():
     return jsonify({"contacts": contacts}), 200
 
 # ============ Create or Get Conversation ============#
+
 @api.route('/conversations', methods=['POST'])
 @jwt_required()
 def create_or_get_conversation():
@@ -193,8 +183,76 @@ def create_or_get_conversation():
         "message": "Conversation created successfully"
     }), 201
 
+# ============ Get Messages in a Conversation ============#
 
+@api.route('/get-messages', methods=['GET'])
+@jwt_required()
+def get_messages():
+    current_user_id = get_jwt_identity()
+    conversation_id = request.args.get('conversation_id')
+    
+    if not conversation_id:
+        return jsonify({"error": "Conversation ID is required"}), 400
+    
+    # Check if user is a member of the conversation
+    membership = ConversationMember.query.filter_by(
+        user_id=current_user_id,
+        conversation_id=conversation_id
+    ).first()
+    
+    if not membership:
+        return jsonify({"error": "You are not a member of this conversation"}), 403
+    
+    # Get messages in the conversation
+    messages = Message.query.filter_by(conversation_id=conversation_id).order_by(Message.created_at).all()
+    
+    messages_data = [msg.serialize() for msg in messages]
+    
+    return jsonify({"messages": messages_data}), 200
 
-# @api.route('/get-messages', methods=['GET'])
-# @jwt_required()
-# def get_messages():
+# ============ Send Message ============#
+
+@api.route('/send-message', methods=['POST'])
+@jwt_required()
+def send_message():
+    current_user_id = get_jwt_identity()
+    data = request.get_json()
+    conversation_id = data.get('conversation_id')
+    content = data.get('content')
+    
+    if not conversation_id or not content:
+        return jsonify({"error": "Conversation ID and content are required"}), 400
+    
+    # Check if user is a member of the conversation
+    membership = ConversationMember.query.filter_by(
+        user_id=current_user_id,
+        conversation_id=conversation_id
+    ).first()
+    
+    if not membership:
+        return jsonify({"error": "You are not a member of this conversation"}), 403
+    
+    # Get other members in the conversation to set as recipients
+    other_members = ConversationMember.query.filter(
+        ConversationMember.conversation_id == conversation_id,
+        ConversationMember.user_id != current_user_id
+    ).all()
+    
+    if not other_members:
+        return jsonify({"error": "No other members in the conversation"}), 400
+    
+    # For simplicity, send message to the first other member found
+    recipient_id = other_members[0].user_id
+    
+    new_message = Message(
+        user_id=current_user_id,
+        recipient_id=recipient_id,
+        conversation_id=conversation_id,
+        content=content,
+        is_read=False
+    )
+    
+    db.session.add(new_message)
+    db.session.commit()
+    
+    return jsonify({"message": "Message sent successfully", "message_data": new_message.serialize()}), 201

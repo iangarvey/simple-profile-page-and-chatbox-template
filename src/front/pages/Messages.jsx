@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { ContactTab } from "../components/ContactTab";
+import { ChatBox } from "../components/ChatBox";
 
 export const Messages = () => {
     const [contacts, setContacts] = useState([]);
@@ -75,7 +76,7 @@ export const Messages = () => {
                     <div className="p-3">
                         <h5>Chat with {selectedContact.username}</h5>
                         {/* This is where you'll add your message components later */}
-                        <div className="text-muted">Message box coming soon...</div>
+                        <div className="text-muted"><ChatBox selectedContact={selectedContact} /></div>
                     </div>
                 ) : (
                     <div className="d-flex align-items-center justify-content-center h-100">
