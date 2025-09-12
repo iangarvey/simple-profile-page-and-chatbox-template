@@ -190,6 +190,7 @@ def create_or_get_conversation():
 def get_messages():
     current_user_id = get_jwt_identity()
     conversation_id = request.args.get('conversation_id')
+    username = request.args.get('username')
     
     if not conversation_id:
         return jsonify({"error": "Conversation ID is required"}), 400
@@ -199,16 +200,18 @@ def get_messages():
         user_id=current_user_id,
         conversation_id=conversation_id
     ).first()
+
     
     if not membership:
         return jsonify({"error": "You are not a member of this conversation"}), 403
     
     # Get messages in the conversation
     messages = Message.query.filter_by(conversation_id=conversation_id).order_by(Message.created_at).all()
-    
+    user_1 = User.query.filter_by(id=messages[0].user_id).first() if messages else None
+    user_2 = User.query.filter_by(id=messages[0].recipient_id).first() if messages else None
     messages_data = [msg.serialize() for msg in messages]
-    
-    return jsonify({"messages": messages_data}), 200
+
+    return jsonify({"messages": messages_data, "user_one":{"username": user_1.username, "id": user_1.id}, "user_two": {"username": user_2.username, "id": user_2.id}}), 200
 
 # ============ Send Message ============#
 

@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 
 export const ChatBox = ({ selectedContact }) => {
+  const [user2, setUser2] = useState(null);
+  const [user1, setUser1] = useState(null);
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState("");
@@ -39,16 +41,18 @@ export const ChatBox = ({ selectedContact }) => {
       }
 
       setMessages(data.messages);
+      setUser1(data.user_one);
+      setUser2(data.user_two);
       setError("");
       setLoading(false);
     };
-    
+
     fetchMessages();
   }, [selectedContact, apiUrl]);
 
   const sendMessage = async () => {
     if (!inputValue.trim() || !selectedContact) return;
-    
+
     const token = localStorage.getItem("token");
 
     const response = await fetch(`${apiUrl}api/send-message`, {
@@ -57,9 +61,9 @@ export const ChatBox = ({ selectedContact }) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         conversation_id: selectedContact.conversation_id,
-        content: inputValue.trim() 
+        content: inputValue.trim(),
       }),
     });
 
@@ -70,13 +74,13 @@ export const ChatBox = ({ selectedContact }) => {
     }
 
     // Add the new message to the messages array
-    setMessages(prev => [...prev, data.message_data]);
+    setMessages((prev) => [...prev, data.message_data]);
     setInputValue("");
     setError("");
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       sendMessage();
     }
   };
@@ -84,36 +88,44 @@ export const ChatBox = ({ selectedContact }) => {
   if (!selectedContact) {
     return (
       <div className="d-flex align-items-center justify-content-center h-100">
-        <div className="text-muted">Select a conversation to start messaging</div>
+        <div className="text-muted">
+          Select a conversation to start messaging
+        </div>
       </div>
     );
   }
 
   return (
     <div className="chatbox-container p-3 h-100 d-flex flex-column">
-      
       {error && <div className="alert alert-danger">{error}</div>}
-      
+
       <div
         className="chat-messages flex-grow-1 border rounded p-3 mb-3"
         style={{
           height: "350px",
           overflowY: "auto",
-          minHeight: "350px"
+          minHeight: "350px",
         }}
       >
         {loading ? (
           <div className="text-center">Loading messages...</div>
         ) : messages.length === 0 ? (
-          <div className="text-center text-muted">No messages yet. Start the conversation!</div>
+          <div className="text-center text-muted">
+            No messages yet. Start the conversation!
+          </div>
         ) : (
           messages.map((msg) => (
             <div key={msg.id} className="mb-2">
-              <div className={`d-inline-block p-2 rounded ${
-                msg.user_id === parseInt(localStorage.getItem('current_user_id'))
-                ? 'bg-primary text-white ms-auto' 
-                : 'bg-light'
-              }`} style={{ maxWidth: '70%' }}>
+              <div
+                className={`d-inline-block p-2 rounded ${
+                  msg.user_id ===
+                  parseInt(localStorage.getItem("current_user_id"))
+                    ? "bg-primary text-white ms-auto"
+                    : "bg-light"
+                }`}
+                style={{ maxWidth: "70%" }}
+              >
+                {msg.user_id === user1.id ? user1.username : user2.username}:
                 {msg.content}
               </div>
               <small className="d-block text-muted">
@@ -123,7 +135,7 @@ export const ChatBox = ({ selectedContact }) => {
           ))
         )}
       </div>
-      
+
       <div className="chat-input d-flex">
         <input
           type="text"
