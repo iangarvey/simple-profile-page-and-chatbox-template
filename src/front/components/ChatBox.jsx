@@ -114,25 +114,34 @@ export const ChatBox = ({ selectedContact }) => {
             No messages yet. Start the conversation!
           </div>
         ) : (
-          messages.map((msg) => (
-            <div key={msg.id} className="mb-2">
-              <div
-                className={`d-inline-block p-2 rounded ${
-                  msg.user_id ===
-                  parseInt(localStorage.getItem("current_user_id"))
-                    ? "bg-primary text-white ms-auto"
-                    : "bg-light"
-                }`}
-                style={{ maxWidth: "70%" }}
+          messages.map((msg) => {
+            const isUser1 = msg.user_id === user1?.id;
+            const username = isUser1 ? user1.username : user2.username;
+            
+            return (
+              <div 
+                key={msg.id} 
+                className={`mb-3 d-flex flex-column ${isUser1 ? 'align-items-end' : 'align-items-start'}`}
               >
-                {msg.user_id === user1.id ? user1.username : user2.username}:
-                {msg.content}
+                <small className="text-muted mb-1">
+                  {username}
+                </small>
+                <div
+                  className={`p-2 rounded ${
+                    isUser1
+                      ? "bg-primary text-white"
+                      : "bg-light text-dark"
+                  }`}
+                  style={{ maxWidth: "70%" }}
+                >
+                  {msg.content}
+                </div>
+                <small className="text-muted mt-1">
+                  {new Date(msg.created_at).toLocaleTimeString()}
+                </small>
               </div>
-              <small className="d-block text-muted">
-                {new Date(msg.created_at).toLocaleTimeString()}
-              </small>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 
